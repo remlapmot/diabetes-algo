@@ -21,7 +21,7 @@ from variable_helper_functions import *
 
 # numpy for random seed - and set random seed
 #import numpy as np 
-#np.random.seed(1928374) # random seed
+#np.random.seed(209109) # random seed
 
 #######################################################################################
 # DEFINE or IMPORT the index date
