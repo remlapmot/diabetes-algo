@@ -62,9 +62,9 @@ dataset.t1dm_date = minimum_of(
     (first_matching_event_apc_before(diabetes_type1_icd10, index_date).admission_date)
 )
 # Count codes (individually and together, for diabetes algo)
-dataset.tmp_t1dm_ctv3_count = count_matching_event_clinical_ctv3_before(diabetes_type1_ctv3, index_date)
-dataset.tmp_t1dm_hes_count = count_matching_event_apc_before(diabetes_type1_icd10, index_date)
-dataset.tmp_t1dm_count = dataset.tmp_t1dm_ctv3_count + dataset.tmp_t1dm_hes_count
+tmp_t1dm_ctv3_count = count_matching_event_clinical_ctv3_before(diabetes_type1_ctv3, index_date)
+tmp_t1dm_hes_count = count_matching_event_apc_before(diabetes_type1_icd10, index_date)
+dataset.tmp_t1dm_count = tmp_t1dm_ctv3_count + tmp_t1dm_hes_count
 
 ## Type 2 Diabetes
 # First date from primary+secondary, but also primary care date separately for diabetes algo)
@@ -74,9 +74,9 @@ dataset.t2dm_date = minimum_of(
     (first_matching_event_apc_before(diabetes_type2_icd10, index_date).admission_date)
 )
 # Count codes (individually and together, for diabetes algo)
-dataset.tmp_t2dm_ctv3_count = count_matching_event_clinical_ctv3_before(diabetes_type2_ctv3, index_date)
-dataset.tmp_t2dm_hes_count = count_matching_event_apc_before(diabetes_type2_icd10, index_date)
-dataset.tmp_t2dm_count = dataset.tmp_t2dm_ctv3_count + dataset.tmp_t2dm_hes_count
+tmp_t2dm_ctv3_count = count_matching_event_clinical_ctv3_before(diabetes_type2_ctv3, index_date)
+tmp_t2dm_hes_count = count_matching_event_apc_before(diabetes_type2_icd10, index_date)
+dataset.tmp_t2dm_count = tmp_t2dm_ctv3_count + tmp_t2dm_hes_count
 
 ## Diabetes unspecified/other
 # First date
