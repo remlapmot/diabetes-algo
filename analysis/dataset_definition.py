@@ -1,3 +1,7 @@
+# numpy for random seed - and set random seed
+#import numpy as np 
+#np.random.seed(209109) # random seed
+
 #######################################################################################
 # IMPORT
 #######################################################################################
@@ -18,10 +22,6 @@ from codelists import *
 
 ## Import the variable helper functions 
 from variable_helper_functions import *
-
-# numpy for random seed - and set random seed
-#import numpy as np 
-#np.random.seed(209109) # random seed
 
 #######################################################################################
 # DEFINE or IMPORT the index date

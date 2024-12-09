@@ -1,19 +1,16 @@
 ################################################################################
 ## This script does the following:
-# 1. Import/extract feather dataset from OpenSAFELY 
+# 1. Import/extract feather dataset from OpenSAFELY: 21 variables needed from OpenSAFELY
 # 2. Basic type formatting of variables -> fn_extract_data.R()
-# 3. Process some covariates and apply the diabetes algorithm -> fn_diabetes_algorithm()
-# 4. Evaluate/apply the quality assurance criteria -> fn_quality_assurance_midpoint6()
-# 5. Evaluate/apply the completeness criteria: -> fn_completeness_criteria_midpoint6()
-# 6. Evaluate/apply the eligibility criteria: -> fn_elig_criteria_midpoint6()
-# (for now: just to double-check: Assign treatment and main outcome)
-## Save the output: data_processed and the 1-row tables for the flow chart
+# 3. Process the ethnicity covariate and apply the diabetes algorithm -> fn_diabetes_algorithm.R()
+# 4. Save the output: data_processed containing only 8 variables
 ################################################################################
 
 ################################################################################
 # 0.0 Import libraries + functions
 ################################################################################
 library('arrow')
+library('readr')
 library('here')
 library('lubridate')
 library('dplyr')
@@ -50,3 +47,11 @@ data_extracted <- data_extracted %>%
     )
 # apply diabetes algorithm and delete all helper variables (tmp & step) at the end
 data_processed <- fn_diabetes_algorithm(data_extracted)
+
+## CAVE: it drops all variables that contains("tmp") or contains("step") !!
+
+################################################################################
+# 4 Save output
+################################################################################
+# the data
+write_rds(data_processed, here::here("output", "data_processed.rds"))

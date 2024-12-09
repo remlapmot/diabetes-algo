@@ -6,3 +6,11 @@ actions:
     outputs:
       highly_sensitive:
         dataset: output/dataset.arrow
+
+  data_process:
+    run: r:latest analysis/data_process.R
+    needs:
+    - generate_dataset
+    outputs:
+      highly_sensitive:
+        rds: output/*.rds
