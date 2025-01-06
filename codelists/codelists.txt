@@ -1,4 +1,4 @@
-opensafely/ethnicity/2020-04-27
+opensafely/ethnicity-snomed-0removed/2e641f61
 
 user/hjforbes/type-1-diabetes/674fbd7a
 user/hjforbes/type-2-diabetes/3530d710

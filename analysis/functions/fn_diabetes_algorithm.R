@@ -1,18 +1,19 @@
-fn_diabetes_algorithm <- function(data_extracted){
-  data_extracted <- data_extracted %>%
-    
+fn_diabetes_algorithm <- function(data){
+  data <- data %>%
+
     # Preparation Step: Define helper variables needed for step 5
-    mutate(tmp_first_diabetes_diag_year = as.integer(format(tmp_first_diabetes_diag_date,"%Y")),
-           tmp_age_1st_diag = tmp_first_diabetes_diag_year - birth_year_num,
+    mutate(tmp_birth_year_num = as.numeric(format(as.Date(birth_date, format = "%Y-%m-%d"), "%Y")),
+           tmp_first_diabetes_diag_year = as.integer(format(tmp_first_diabetes_diag_date,"%Y")),
+           tmp_age_1st_diag = tmp_first_diabetes_diag_year - tmp_birth_year_num,
            tmp_age_1st_diag = replace(tmp_age_1st_diag, which(tmp_age_1st_diag < 0), NA),
-           tmp_age_under_35_30_1st_diag = ifelse(!is.na(tmp_age_1st_diag) & 
-                                            (tmp_age_1st_diag < 35 & (ethnicity_cat == "White" | ethnicity_cat == "Mixed" | ethnicity_cat == "Other")) | # if ethnicity is NA, then only age counts
-                                            (tmp_age_1st_diag < 30), "Yes", "No"), 
+           tmp_age_under_35_30_1st_diag = ifelse(!is.na(tmp_age_1st_diag) &
+                                            (tmp_age_1st_diag < 35 & (ethnicity_cat == "1" | ethnicity_cat == "2" | ethnicity_cat == "5")) | # if ethnicity is NA, then only age counts for step 5
+                                            (tmp_age_1st_diag < 30), "Yes", "No"),
            # earliest HbA1c date for only those with >=47.5
            tmp_hba1c_date_step7 = as_date(case_when(tmp_max_hba1c_mmol_mol_num >= 47.5 ~ pmin(tmp_max_hba1c_date, na.rm = TRUE))),
            # take the first process code date in those individuals that have 5 or more process codes
-           tmp_over5_pocc_step7 = as_date(case_when(tmp_poccdm_ctv3_count >= 5 ~ pmin(tmp_poccdm_date, na.rm = TRUE)))) %>%    
-    
+           tmp_over5_pocc_step7 = as_date(case_when(tmp_poccdm_ctv3_count_num >= 5 ~ pmin(tmp_poccdm_date, na.rm = TRUE)))) %>%
+
     # Step 1. Any gestational diabetes code?
     mutate(step_1 = ifelse(!is.na(gestationaldm_date), "Yes", "No")) %>%
 
@@ -71,15 +72,15 @@ fn_diabetes_algorithm <- function(data_extracted){
 
     # Step 6c. Number of type 1 codes > number of type 2 codes? denominator for step 6c: no to step 6b
     mutate(step_6c = ifelse(step_6b == "No" &
-                              tmp_t1dm_count > tmp_t2dm_count, "Yes", # count variable cannot be NA, according to ehrQL: count_for_patient() "Note this will be 0 rather than NULL if the patient has no rows at all in the frame." https://docs.opensafely.org/ehrql/reference/language/#PatientFrame.count_for_patient
+                              tmp_t1dm_count_num > tmp_t2dm_count_num, "Yes", # count variable cannot be NA, according to ehrQL: count_for_patient() "Note this will be 0 rather than NULL if the patient has no rows at all in the frame." https://docs.opensafely.org/ehrql/reference/language/#PatientFrame.count_for_patient
                             ifelse(step_6b == "No" &
-                                     tmp_t1dm_count <= tmp_t2dm_count, "No", NA))) %>% # NA will never be fulfilled
+                                     tmp_t1dm_count_num <= tmp_t2dm_count_num, "No", NA))) %>% # NA will never be fulfilled
 
     # Step 6d. Number of type 2 codes > number of type 1 codes denominator for step 6d: no to step 6c
     mutate(step_6d = ifelse(step_6c == "No" &
-                              tmp_t2dm_count > tmp_t1dm_count, "Yes",
+                              tmp_t2dm_count_num > tmp_t1dm_count_num, "Yes",
                             ifelse(step_6c == "No" &
-                                     tmp_t2dm_count <= tmp_t1dm_count, "No", NA))) %>% # NA will never be fulfilled
+                                     tmp_t2dm_count_num <= tmp_t1dm_count_num, "No", NA))) %>% # NA will never be fulfilled
 
     # Step 6e. Type 2 code most recent? denominator for step 6e: no to step 6d
     mutate(step_6e = ifelse(step_6d == "No" &
@@ -91,7 +92,7 @@ fn_diabetes_algorithm <- function(data_extracted){
     mutate(step_7 = ifelse(step_6 == "No" & # includes missing in t1dm_date or t2dm_date in step_6
                              ((!is.na(tmp_diabetes_medication_date)) |
                                 (tmp_max_hba1c_mmol_mol_num >= 47.5) |
-                                (tmp_poccdm_ctv3_count >= 5)), "Yes",
+                                (tmp_poccdm_ctv3_count_num >= 5)), "Yes",
                            ifelse(step_6=="No" , "No", NA))) %>% # NA will never be fulfilled. Those with missing t1dm_date/t2dm and missing any other evidence for DM (medication, hba1c, procedure codes) will be classified as no diabetes (step_7 == "No")
 
     # Create Diabetes Variable

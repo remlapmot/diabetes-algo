@@ -7,9 +7,3 @@ fn_case_when <- function(...) {
   levels <- levels[!is.na(levels)]
   factor(dplyr::case_when(...), levels=levels)
 }
-
-# Rounding function for redaction ----------------------------------------------
-fn_roundmid_any <- function(x, to=1){
-  # centers on (integer) midpoint of the rounding points
-  ceiling(x/to)*to - (floor(to/2)*(x!=0))
-}

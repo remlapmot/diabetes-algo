@@ -43,16 +43,16 @@ dataset.define_population(patients.exists_for_patient())
 ## add emergency table?
 
 ## Demographics
-# Year of birth
-dataset.birth_year_num = patients.date_of_birth
+dataset.birth_date = patients.date_of_birth
 
 # Ethnicity in 6 categories
-dataset.ethnicity_cat = (
-    clinical_events.where(clinical_events.ctv3_code.is_in(ethnicity_codes))
+latest_ethnicity_code = (
+    clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codes))
     .sort_by(clinical_events.date)
     .last_for_patient()
-    .ctv3_code.to_category(ethnicity_codes)
+    .snomedct_code
 )
+dataset.ethnicity_cat = latest_ethnicity_code.to_category(ethnicity_codes)
 
 ## Type 1 Diabetes 
 # First date from primary+secondary, but also primary care date separately for diabetes algo
@@ -64,7 +64,7 @@ dataset.t1dm_date = minimum_of(
 # Count codes (individually and together, for diabetes algo)
 tmp_t1dm_ctv3_count = count_matching_event_clinical_ctv3_before(diabetes_type1_ctv3, index_date)
 tmp_t1dm_hes_count = count_matching_event_apc_before(diabetes_type1_icd10, index_date)
-dataset.tmp_t1dm_count = tmp_t1dm_ctv3_count + tmp_t1dm_hes_count
+dataset.tmp_t1dm_count_num = tmp_t1dm_ctv3_count + tmp_t1dm_hes_count
 
 ## Type 2 Diabetes
 # First date from primary+secondary, but also primary care date separately for diabetes algo)
@@ -76,13 +76,13 @@ dataset.t2dm_date = minimum_of(
 # Count codes (individually and together, for diabetes algo)
 tmp_t2dm_ctv3_count = count_matching_event_clinical_ctv3_before(diabetes_type2_ctv3, index_date)
 tmp_t2dm_hes_count = count_matching_event_apc_before(diabetes_type2_icd10, index_date)
-dataset.tmp_t2dm_count = tmp_t2dm_ctv3_count + tmp_t2dm_hes_count
+dataset.tmp_t2dm_count_num = tmp_t2dm_ctv3_count + tmp_t2dm_hes_count
 
 ## Diabetes unspecified/other
 # First date
 dataset.otherdm_date = first_matching_event_clinical_ctv3_before(diabetes_other_ctv3, index_date).date
 # Count codes
-dataset.tmp_otherdm_count = count_matching_event_clinical_ctv3_before(diabetes_other_ctv3, index_date)
+dataset.tmp_otherdm_count_num = count_matching_event_clinical_ctv3_before(diabetes_other_ctv3, index_date)
 
 ## Gestational diabetes
 # First date from primary+secondary
@@ -95,7 +95,7 @@ dataset.gestationaldm_date = minimum_of(
 # First date
 dataset.tmp_poccdm_date = first_matching_event_clinical_ctv3_before(diabetes_diagnostic_ctv3, index_date).date
 # Count codes
-dataset.tmp_poccdm_ctv3_count = count_matching_event_clinical_ctv3_before(diabetes_diagnostic_ctv3, index_date)
+dataset.tmp_poccdm_ctv3_count_num = count_matching_event_clinical_ctv3_before(diabetes_diagnostic_ctv3, index_date)
 
 ### Other variables needed to define diabetes
 ## HbA1c

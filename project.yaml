@@ -2,15 +2,17 @@ version: '4.0'
 
 actions:
   generate_dataset:
-    run: ehrql:v1 generate-dataset analysis/dataset_definition.py --output output/dataset.arrow
+    run: ehrql:v1 generate-dataset analysis/dataset_definition.py --output output/input.csv
     outputs:
       highly_sensitive:
-        dataset: output/dataset.arrow
+        dataset: output/input.csv
 
-  data_process:
-    run: r:latest analysis/data_process.R
+  data_process_RA:
+    run: r:latest analysis/data_process_RA.R
     needs:
     - generate_dataset
     outputs:
       highly_sensitive:
-        rds: output/*.rds
+        rds: output/data_processed.rds
+      moderately_sensitive:
+        arguments: output/args-data_processed.rds
