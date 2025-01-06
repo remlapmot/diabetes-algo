@@ -14,5 +14,5 @@ actions:
     outputs:
       highly_sensitive:
         rds: output/data_processed.rds
-      moderately_sensitive:
-        arguments: output/args-data_processed.csv
+      #moderately_sensitive:
+      #  arguments: output/args-data_processed.csv

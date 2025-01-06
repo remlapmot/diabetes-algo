@@ -101,10 +101,10 @@ record_args <- data.frame(argument = names(opt),
                           value = unlist(opt),
                           stringsAsFactors = FALSE)
 row.names(record_args) <- NULL
-print(record_args)
-write.csv(record_args,
-          file = paste0("output/args-", opt$df_output),
-          row.names = FALSE)
+# print(record_args)
+# write.csv(record_args,
+#           file = paste0("output/args-", opt$df_output),
+#           row.names = FALSE)
 
 ################################################################################
 # Load data
