@@ -20,6 +20,11 @@ print("Import diabetes algo function")
 source(here::here("analysis", "functions", "fn_diabetes_algorithm.R"))
 
 ################################################################################
+# Create directory for output
+################################################################################
+fs::dir_create(here::here("output"))
+
+################################################################################
 # Define flag style arguments using the optparse package
 ################################################################################
 option_list <- list(
