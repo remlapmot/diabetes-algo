@@ -30,7 +30,7 @@ option_list <- list(
               help = "Birth date [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--ethnicity_cat", type = "character", default = "ethnicity_cat",
-              help = "Ethnicity, in 6 categories, in numbers 0-5, 0:Unknown, 1:White, 2:Mixed, 3:South Asian, 4:Black, 5:Other, [default %default]",
+              help = "Ethnicity, in 6 categories, in numbers 0-5, 0:Unknown, 1:White, 2:Mixed, 3:South Asian, 4:Black, 5:Other [default %default]",
               metavar = "ethnicity_varname"),
   make_option("--t1dm_date", type = "character", default = "t1dm_date",
               help = "First type 1 DM diagnosis date variable, from both primary and secondary care sources [default %default]",
@@ -234,5 +234,4 @@ data_processed <- merge(non_core, core,
 # Save output
 ################################################################################
 print("Save output")
-write_rds(data_processed,
-          file = paste0("output/", opt$df_output))
+write_rds(data_processed, paste0("output/", opt$df_output))
