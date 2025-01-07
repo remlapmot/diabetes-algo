@@ -18,6 +18,7 @@ library('optparse')
 
 print("Import diabetes algo function")
 source(here::here("analysis", "functions", "fn_diabetes_algorithm.R"))
+source(here::here("analysis", "functions", "fn_diabetes_algorithm_streamlined.R"))
 
 ################################################################################
 # Define flag style arguments using the optparse package
@@ -219,8 +220,9 @@ core <- core %>%
 # Apply the diabetes algorithm
 ################################################################################
 print("Apply the diabetes algorithm and delete all tmp & step variables")
-core <- fn_diabetes_algorithm(core)
-
+# core <- fn_diabetes_algorithm(core)
+core_2 <- fn_diabetes_algorithm_streamlined(core)
+names(core)
 ################################################################################
 # Merge the core back to the user data
 ################################################################################
