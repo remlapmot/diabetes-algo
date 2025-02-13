@@ -34,6 +34,9 @@ option_list <- list(
   make_option("--df_input", type = "character", default = "input.csv",
               help = "Input dataset. csv file. Assumed to be within the directory 'output' [default %default]",
               metavar = "filename.csv"),
+  make_option("--remove_helper", type = "logical", default = TRUE,
+              help = "Logical, indicating whether all helper variables (_tmp and step_) are removed [default %default]",
+              metavar = "TRUE/FALSE"),
   make_option("--birth_date", type = "character", default = "birth_date",
               help = "Birth date [default %default]",
               metavar = "YYYY-MM-DD"),
@@ -238,7 +241,13 @@ core <- fn_diabetes_algorithm(core)
 ################################################################################
 # Merge the core back to the user data
 ################################################################################
-# Exclude core variables from user dataset first
+if (opt$remove_helper == TRUE) {
+  print("Remove helper variables")
+  core <- core %>%
+    dplyr::select(-contains("tmp"), -contains("step"))
+}
+
+# Exclude first the core variables from users' input data since they are in both datasets (core and data)
 non_core <- data[setdiff(names(data), c(unlist(column_mapping)))]
 data_processed <- merge(non_core, core,
                         by = "patient_id",

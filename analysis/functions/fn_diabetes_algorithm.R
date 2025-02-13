@@ -166,9 +166,7 @@ fn_diabetes_algorithm <- function(data) {
            t1dm_date = as_date(case_when(cat_diabetes == "T1DM" ~ tmp_first_diabetes_diag_date)),
            # OTHER
            otherdm_date = as_date(case_when(cat_diabetes == "DM_other" ~ pmin(tmp_hba1c_date_step7, tmp_over5_pocc_step7, na.rm = TRUE)))
-           ) %>%
-    # drop unnecessary helper variables
-    dplyr::select(-contains("tmp"), -contains("step")) # we may want to put this step into data_process_RA instead to allow to keep the temporary variables in their datasets in the output (to be specified as an argument in the reusable action). Currently, not implemented, to be discussed.
+           )
 
   return(data)
 }
