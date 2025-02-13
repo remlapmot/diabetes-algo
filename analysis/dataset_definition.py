@@ -8,13 +8,16 @@
 ## Import ehrQL functions
 from ehrql import (
     create_dataset,
-    minimum_of
+    minimum_of,
+    case,
+    when
 )
 
 ## Import TPP tables
 from ehrql.tables.tpp import (
     clinical_events,
-    patients
+    patients,
+    ethnicity_from_sus
 )
 
 ## Import all codelists from codelists.py
@@ -46,13 +49,24 @@ dataset.define_population(patients.exists_for_patient())
 dataset.birth_date = patients.date_of_birth
 
 # Ethnicity in 6 categories
-latest_ethnicity_code = (
+ethnicity_snomed = (
     clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codes))
     .sort_by(clinical_events.date)
     .last_for_patient()
-    .snomedct_code
+    .snomedct_code.to_category(ethnicity_codes)
 )
-dataset.ethnicity_cat = latest_ethnicity_code.to_category(ethnicity_codes)
+
+ethnicity_sus = ethnicity_from_sus.code
+
+dataset.ethnicity_cat = case(
+  when((ethnicity_snomed == "1") | ((ethnicity_snomed.is_null()) & (ethnicity_sus.is_in(["A", "B", "C"])))).then("White"),
+  when((ethnicity_snomed == "2") | ((ethnicity_snomed.is_null()) & (ethnicity_sus.is_in(["D", "E", "F", "G"])))).then("Mixed"),
+  when((ethnicity_snomed == "3") | ((ethnicity_snomed.is_null()) & (ethnicity_sus.is_in(["H", "J", "K", "L"])))).then("South Asian"),
+  when((ethnicity_snomed == "4") | ((ethnicity_snomed.is_null()) & (ethnicity_sus.is_in(["M", "N", "P"])))).then("Black"),
+  when((ethnicity_snomed == "5") | ((ethnicity_snomed.is_null()) & (ethnicity_sus.is_in(["R", "S"])))).then("Other"),
+  otherwise="Unknown", 
+)
+
 
 ## Type 1 Diabetes 
 # First date from primary+secondary, but also primary care date separately for diabetes algo

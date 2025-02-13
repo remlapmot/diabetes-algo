@@ -38,7 +38,7 @@ option_list <- list(
               help = "Birth date [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--ethnicity_cat", type = "character", default = "ethnicity_cat",
-              help = "Ethnicity, in 6 categories, in numbers 0-5, 0:Unknown, 1:White, 2:Mixed, 3:South Asian, 4:Black, 5:Other [default %default]",
+              help = "Ethnicity, in 6 categories: White, Mixed, South Asian, Black, Other, Unknown [default %default]",
               metavar = "ethnicity_varname"),
   make_option("--t1dm_date", type = "character", default = "t1dm_date",
               help = "First type 1 DM diagnosis date variable, from both primary and secondary care sources [default %default]",
@@ -182,6 +182,7 @@ if (any(invalid_dates)) {
     paste(names(invalid_dates)[invalid_dates], collapse = ", ")
   ))
 }
+print("validation passed: all date values are coded as dates in the format %Y-%m-%d")
 
 print("Check the numeric variables")
 numeric_columns <- names(core)[grepl("_num$", names(core))]
@@ -198,19 +199,22 @@ if (any(invalid_numerics)) {
     paste(names(invalid_numerics)[invalid_numerics], collapse = ", ")
   ))
 }
+print("validation passed: all numeric values are coded as numeric")
 
 print("Check the ethnicity variable")
-invalid_ethnicity <- core$ethnicity_cat[!is.na(core$ethnicity_cat) &
-                                          !(core$ethnicity_cat %in% 0:5)]
+valid_ethnicities <- c("White", "Mixed", "South Asian", "Black", "Unknown", "Other")
+# Identify invalid values (including NA, since this should be coded as "Unknown")
+invalid_ethnicity <- core$ethnicity_cat[is.na(core$ethnicity_cat) |
+                                          !(core$ethnicity_cat %in% valid_ethnicities)]
 # Error message
 if (length(invalid_ethnicity) > 0) {
   stop(paste(
     "The 'ethnicity_cat' column contains invalid values:",
     paste(unique(invalid_ethnicity), collapse = ", "),
-    "\nValid values are integers between 0 and 5, or NA."
+    "\nValid values are: White, Mixed, South Asian, Black, Unknown, Other. NA values are not allowed."
   ))
 }
-print("'ethnicity_cat' validation passed: all values are in the range 0-5 or NA.")
+print("'ethnicity_cat' validation passed: all values are valid categories (NA not allowed).")
 
 ################################################################################
 # Reformat the imported core variables

@@ -7,7 +7,7 @@ fn_diabetes_algorithm <- function(data) {
       tmp_age_1st_diag = tmp_first_diabetes_diag_year - tmp_birth_year_num,
       tmp_age_1st_diag = replace(tmp_age_1st_diag, which(tmp_age_1st_diag < 0), NA),
       tmp_age_under_35_30_1st_diag = case_when(!is.na(tmp_age_1st_diag)
-                                               & ((tmp_age_1st_diag < 35 & (ethnicity_cat %in% c("1", "2", "5")))
+                                               & ((tmp_age_1st_diag < 35 & (ethnicity_cat %in% c("White", "Mixed", "Other")))
                                                   | (tmp_age_1st_diag < 30)) ~ "Yes",
                                                TRUE ~ "No"), # prevents any NA: Those with DM but not fulfilling the condition OR those without DM at all -> "No"
       tmp_hba1c_date_step7 = case_when(!is.na(tmp_max_hba1c_mmol_mol_num) & tmp_max_hba1c_mmol_mol_num >= 47.5 ~ tmp_max_hba1c_date,
@@ -16,7 +16,8 @@ fn_diabetes_algorithm <- function(data) {
                                        TRUE ~ as.Date(NA))) %>%
 
     ## --- Step 1: Any gestational diabetes code?
-    mutate(step_1 = ifelse(!is.na(gestationaldm_date), "Yes", "No")
+    mutate(step_1 = case_when(!is.na(gestationaldm_date) ~ "Yes",
+                              TRUE ~ "No")
            ) %>%
 
     ## --- Step 1a: Any T1/T2 diagnostic codes besides gestational diabetes present? Denominator: Those with step 1 == Yes
@@ -86,11 +87,11 @@ fn_diabetes_algorithm <- function(data) {
     ) %>%
 
     ## --- Step 7. Diabetes medication or >5 DM process of care codes or HbA1c >= 6.5 (47.5 mmol/mol)? Denominator: Step 6 == No
-    mutate(step_7 = case_when(step_6 == "No"
+    mutate(step_7 = case_when(step_6 == "No" # this includes only people with both missing t1dm_date & t2dm_date (otherwise fished out further above)
                               & ((!is.na(tmp_diabetes_medication_date)) |
                                    (tmp_max_hba1c_mmol_mol_num >= 47.5) |
-                                   (tmp_poccdm_ctv3_count_num >= 5)) ~ "Yes",
-                              step_6 == "No" ~ "No", # this includes people with any missings in t1dm_date or t2dm_date or tmp_diabetes_medication_date or tmp_max_hba1c_mmol_mol_num or HbA1c too low or not enough procedure codes (i.e. no evidence for DM (medication, hba1c, procedure codes)) => step_7 == "No" => Diabetes unlikely
+                                   (tmp_poccdm_ctv3_count_num >= 5)) ~ "Yes", # any other valid evidence for a diabetes, i.e. "unspecified Diabetes"?
+                              step_6 == "No" ~ "No", # => Diabetes unlikely
                               TRUE ~ NA_character_) # NA will only be fulfilled if not part of denominator.
     ) %>%
 
