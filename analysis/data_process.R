@@ -22,7 +22,6 @@ library('here')
 library('lubridate')
 library('dplyr')
 library('tidyr')
-library('optparse')
 
 print("Import diabetes algo function")
 source(here::here("analysis", "functions", "fn_diabetes_algorithm.R"))
@@ -30,72 +29,76 @@ source(here::here("analysis", "functions", "fn_diabetes_algorithm.R"))
 ################################################################################
 # Define flag style arguments using the optparse package
 ################################################################################
+library('optparse')
 option_list <- list(
   make_option("--df_input", type = "character", default = "input.csv",
-              help = "Input dataset csv filename (this is assumed to be within the output directory) [default %default]",
+              help = "Input dataset. csv file. Assumed to be within the directory 'output' [default %default]",
               metavar = "filename.csv"),
+  make_option("--remove_helper", type = "logical", default = TRUE,
+              help = "Logical, indicating whether all helper variables (_tmp and step_) are removed [default %default]",
+              metavar = "TRUE/FALSE"),
   make_option("--birth_date", type = "character", default = "birth_date",
               help = "Birth date [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--ethnicity_cat", type = "character", default = "ethnicity_cat",
-              help = "Ethnicity, in 6 categories, in numbers 0-5, 0:Unknown, 1:White, 2:Mixed, 3:South Asian, 4:Black, 5:Other [default %default]",
+              help = "Ethnicity, in 6 categories, coded as follows: White, Mixed, South Asian, Black, Other, Unknown. [default %default]",
               metavar = "ethnicity_varname"),
   make_option("--t1dm_date", type = "character", default = "t1dm_date",
-              help = "First type 1 DM diagnosis date variable, from both primary and secondary care sources [default %default]",
+              help = "First type 1 DM diagnosis date, from both primary (e.g. https://www.opencodelists.org/codelist/user/hjforbes/type-1-diabetes/674fbd7a/) and secondary (e.g. https://www.opencodelists.org/codelist/opensafely/type-1-diabetes-secondary-care/2020-09-27/) care [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_t1dm_ctv3_date", type = "character", default = "tmp_t1dm_ctv3_date",
-              help = "First type 1 DM diagnosis date variable, from primary care source only [default %default]",
+              help = "First type 1 DM diagnosis date, from primary care only [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_t1dm_count_num", type = "character", default = "tmp_t1dm_count_num",
-              help = "Variable that counted all recorded Type 1 DM diagnosis codes, from both primary and secondary care sources [default %default]",
+              help = "Count of all recorded Type 1 DM diagnosis codes, from both primary and secondary care [default %default]",
               metavar = "t1dm_count_varname"),
   make_option("--t2dm_date", type = "character", default = "t2dm_date",
-              help = "First type 2 DM diagnosis date variable, from both primary and secondary care sources [default %default]",
+              help = "First type 2 DM diagnosis date, from both primary (e.g. https://www.opencodelists.org/codelist/user/hjforbes/type-2-diabetes/3530d710/) and secondary (e.g. https://www.opencodelists.org/codelist/user/r_denholm/type-2-diabetes-secondary-care-bristol/0b7f6cd4/) care [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_t2dm_ctv3_date", type = "character", default = "tmp_t2dm_ctv3_date",
-              help = "First type 2 DM diagnosis date variable, from primary care source only [default %default]",
+              help = "First type 2 DM diagnosis date, from primary care only [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_t2dm_count_num", type = "character", default = "tmp_t2dm_count_num",
-              help = "Variable that counted all recorded Type 2 DM diagnosis codes, from both primary and secondary care sources [default %default]",
+              help = "Count of all recorded Type 2 DM diagnosis codes, from both primary and secondary care [default %default]",
               metavar = "t2dm_count_varname"),
   make_option("--otherdm_date", type = "character", default = "otherdm_date",
-              help = "First other/unspecified DM diagnosis date variable, from primary care source only [default %default]",
+              help = "First other/unspecified DM diagnosis date, from primary care (e.g. https://www.opencodelists.org/codelist/user/hjforbes/other-or-nonspecific-diabetes/0311f0a6/) only [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_otherdm_count_num", type = "character", default = "tmp_otherdm_count_num",
-              help = "Variable that counted all recorded other/unspecified DM diagnosis codes, from primary care source only [default %default]",
+              help = "Count of all recorded other/unspecified DM diagnosis codes, from primary care only [default %default]",
               metavar = "otherdm_count_varname"),
   make_option("--gestationaldm_date", type = "character", default = "gestationaldm_date",
-              help = "First gestational DM diagnosis date variable, from both primary and secondary care sources [default %default]",
+              help = "First gestational DM diagnosis date, from both primary (e.g. https://www.opencodelists.org/codelist/user/hjforbes/gestational-diabetes/1ed423d1/) and secondary (e.g. https://www.opencodelists.org/codelist/user/alainamstutz/gestational-diabetes-icd10-bristol/474e7a09/) care [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_poccdm_date", type = "character", default = "tmp_poccdm_date",
-              help = "First Non-diagnostic DM code date variable, from primary care source only [default %default], https://www.opencodelists.org/codelist/user/hjforbes/nondiagnostic-diabetes-codes/50f30a3b/",
+              help = "First Non-diagnostic DM code date, from primary care (e.g. https://www.opencodelists.org/codelist/user/hjforbes/nondiagnostic-diabetes-codes/50f30a3b/) only [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_poccdm_ctv3_count_num", type = "character", default = "tmp_poccdm_ctv3_count_num",
-              help = "Variable that counted all recorded Non-diagnostic DM codes, from primary care source only [default %default]",
+              help = "Count of all recorded Non-diagnostic DM codes, from primary care only [default %default]",
               metavar = "non_diag_dm_code_count_varname"),
   make_option("--tmp_max_hba1c_mmol_mol_num", type = "character", default = "tmp_max_hba1c_mmol_mol_num",
-              help = "HbA1c, max. value recorded in query period, in mmol/mol, from primary care source only [default %default]",
+              help = "Maximum HbA1c value recorded in query period, in mmol/mol (use https://www.opencodelists.org/codelist/opensafely/glycated-haemoglobin-hba1c-tests-numerical-value/5134e926/) from primary care only [default %default]",
               metavar = "max_hba1c_varname"),
   make_option("--tmp_max_hba1c_date", type = "character", default = "tmp_max_hba1c_date",
-              help = "First max. HbA1c value date, from primary care source only [default %default]",
+              help = "First maximum HbA1c value date, from primary care only [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_insulin_dmd_date", type = "character", default = "tmp_insulin_dmd_date",
-              help = "First insulin drug date variable, from primary care source only [default %default]",
+              help = "First insulin drug date variable, from primary care (e.g. https://www.opencodelists.org/codelist/opensafely/insulin-medication/2020-04-26/) only [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_antidiabetic_drugs_dmd_date", type = "character", default = "tmp_antidiabetic_drugs_dmd_date",
-              help = "First antidiabetic drug (any, except insulin) date variable, from primary care source only [default %default]",
+              help = "First antidiabetic drug (any, except insulin) date, from primary care (e.g. https://www.opencodelists.org/codelist/opensafely/antidiabetic-drugs/2020-07-16/) only [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_nonmetform_drugs_dmd_date", type = "character", default = "tmp_nonmetform_drugs_dmd_date",
-              help = "First antidiabetic drug (any, except insulin and metformin) date variable, from primary care source only [default %default]",
+              help = "First antidiabetic drug (any, except insulin and metformin) date, from primary care (e.g. https://www.opencodelists.org/codelist/user/r_denholm/non-metformin-antidiabetic-drugs_bristol/7207eb58/) only [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_diabetes_medication_date", type = "character", default = "tmp_diabetes_medication_date",
-              help = "First antidiabetic drug date variable, minimum of insulin_date and antidiabetic_drugs_date [default %default]",
+              help = "First antidiabetic drug date, i.e. minimum of tmp_insulin_dmd_date and tmp_antidiabetic_drugs_dmd_date [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--tmp_first_diabetes_diag_date", type = "character", default = "tmp_first_diabetes_diag_date",
-              help = "First diabetes diagnosis date variable, minimum of t1dm_date, t2dm_date, otherdm_date, gestationaldm_date, non_diag_dm_code_date, nonmetform_drugs_date, and diabetes_medication_date [default %default]",
+              help = "First diabetes diagnosis date variable, i.e. minimum of t1dm_date, t2dm_date, otherdm_date, gestationaldm_date, tmp_poccdm_date, tmp_nonmetform_drugs_dmd_date, and tmp_diabetes_medication_date [default %default]",
               metavar = "YYYY-MM-DD"),
   make_option("--df_output", type = "character", default = "data_processed.rds",
-              help = "Output data rds filename (this is assumed to be within the output directory) [default %default]",
+              help = "Output dataset. rds file. This is assumed to be added to the directory 'output' [default %default]",
               metavar = "filename.rds")
 )
 opt_parser <- OptionParser(usage = "diabetes-algo:[version] [options]", option_list = option_list)
@@ -109,6 +112,8 @@ record_args <- data.frame(argument = names(opt),
                           value = unlist(opt),
                           stringsAsFactors = FALSE)
 row.names(record_args) <- NULL
+
+### Is this needed?
 # print(record_args)
 # write.csv(record_args,
 #           file = paste0("output/args-", opt$df_output),
@@ -182,6 +187,7 @@ if (any(invalid_dates)) {
     paste(names(invalid_dates)[invalid_dates], collapse = ", ")
   ))
 }
+print("validation passed: all date values are coded as dates in the format %Y-%m-%d")
 
 print("Check the numeric variables")
 numeric_columns <- names(core)[grepl("_num$", names(core))]
@@ -198,19 +204,22 @@ if (any(invalid_numerics)) {
     paste(names(invalid_numerics)[invalid_numerics], collapse = ", ")
   ))
 }
+print("validation passed: all numeric values are coded as numeric")
 
 print("Check the ethnicity variable")
-invalid_ethnicity <- core$ethnicity_cat[!is.na(core$ethnicity_cat) &
-                                          !(core$ethnicity_cat %in% 0:5)]
+valid_ethnicities <- c("White", "Mixed", "South Asian", "Black", "Unknown", "Other")
+# Identify invalid values (including NA, since this should be coded as "Unknown")
+invalid_ethnicity <- core$ethnicity_cat[is.na(core$ethnicity_cat) |
+                                          !(core$ethnicity_cat %in% valid_ethnicities)]
 # Error message
 if (length(invalid_ethnicity) > 0) {
   stop(paste(
     "The 'ethnicity_cat' column contains invalid values:",
     paste(unique(invalid_ethnicity), collapse = ", "),
-    "\nValid values are integers between 0 and 5, or NA."
+    "\nValid values are: White, Mixed, South Asian, Black, Unknown, Other. NA values are not allowed."
   ))
 }
-print("'ethnicity_cat' validation passed: all values are in the range 0-5 or NA.")
+print("'ethnicity_cat' validation passed: all values are valid categories (NA not allowed).")
 
 ################################################################################
 # Reformat the imported core variables
@@ -232,7 +241,13 @@ core <- fn_diabetes_algorithm(core)
 ################################################################################
 # Merge the core back to the user data
 ################################################################################
-# Exclude core variables from user dataset first
+if (opt$remove_helper == TRUE) {
+  print("Remove helper variables")
+  core <- core %>%
+    dplyr::select(-contains("tmp"), -contains("step"))
+}
+
+# Exclude first the core variables from users' input data since they are in both datasets (core and data)
 non_core <- data[setdiff(names(data), c(unlist(column_mapping)))]
 data_processed <- merge(non_core, core,
                         by = "patient_id",
