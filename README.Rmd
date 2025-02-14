@@ -11,14 +11,14 @@ This is the code and configuration for `diabetes-algo`, which is an R reusable a
 
 The action:
 
-- Loads and double-checks 21 input variables (see Usage)
-- Runs the diabetes adjudication algorithm to define Diabetes types: Type 1, Type 2, Gestational, other, unlikely (see Figure 1)
+- Loads and double-checks 21 input variables
+- Runs the diabetes adjudication algorithm (Figure 1 below) to define the following Diabetes types: Type 1, Type 2, Gestational, Other, Unlikely
 
 ## Usage
 
-The arguments/options to the action are specified using the flags style (i.e., `--argname=argvalue`), 
-the arguments are as follows.
-
+The input variables/arguments/options to the action are specified using the flags style (i.e., `--argname=argvalue`).
+Below, you find a detailed description of each input variable including examples for codelists to use when defining these variables in the OpenSAFELY dataset definition.
+An example of a dataset definition that defines each 21 input variables, find [here](https://github.com/alainamstutz/diabetes-algo/blob/main/analysis/dataset_definition.py). 
 ```{r, include=FALSE}
 # Taken from
 # https://github.com/yihui/knitr-examples/blob/master/077-wrap-output.Rmd
@@ -65,6 +65,10 @@ generate_dataset:
 diabetes_algo:
   run: >
     diabetes-algo:[version]
+      --birth_date=your_dob_date_variable
+      --tmp_t1dm_ctv3_date=your_t2dm_from_primcare_date_variable
+      --tmp_max_hba1c_mmol_mol_num=your_max_hba1c_num_variable
+      --etc.
       --df_output=data_processed.rds
   needs:
   - generate_dataset

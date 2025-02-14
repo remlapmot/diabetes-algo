@@ -9,14 +9,20 @@ reusable action for the OpenSAFELY framework.
 
 The action:
 
-- Loads and double-checks 21 input variables (see Usage)
-- Runs the diabetes adjudication algorithm to define Diabetes types:
-  Type 1, Type 2, Gestational, other, unlikely (see Figure 1)
+- Loads and double-checks 21 input variables
+- Runs the diabetes adjudication algorithm (Figure 1 below) to define
+  the following Diabetes types: Type 1, Type 2, Gestational, Other,
+  Unlikely
 
 ## Usage
 
-The arguments/options to the action are specified using the flags style
-(i.e., `--argname=argvalue`), the arguments are as follows.
+The input variables/arguments/options to the action are specified using
+the flags style (i.e., `--argname=argvalue`). Below, you find a detailed
+description of each input variable including examples for codelists to
+use when defining these variables in the OpenSAFELY dataset definition.
+An example of a dataset definition that defines each 21 input variables,
+find
+[here](https://github.com/alainamstutz/diabetes-algo/blob/main/analysis/dataset_definition.py).
 
     Usage: diabetes-algo:[version] [options]
 
@@ -25,6 +31,10 @@ The arguments/options to the action are specified using the flags style
     --df_input=FILENAME.CSV
     Input dataset. csv file. Assumed to be within the directory 'output' [default
     input.csv]
+
+    --remove_helper=TRUE/FALSE
+    Logical, indicating whether all helper variables (_tmp and step_) are removed
+    [default TRUE]
 
     --birth_date=YYYY-MM-DD
     Birth date [default birth_date]
@@ -154,6 +164,10 @@ generate_dataset:
 diabetes_algo:
   run: >
     diabetes-algo:[version]
+      --birth_date=your_dob_date_variable
+      --tmp_t1dm_ctv3_date=your_t2dm_from_primcare_date_variable
+      --tmp_max_hba1c_mmol_mol_num=your_max_hba1c_num_variable
+      --etc.
       --df_output=data_processed.rds
   needs:
   - generate_dataset
