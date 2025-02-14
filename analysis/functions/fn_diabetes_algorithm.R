@@ -158,14 +158,18 @@ fn_diabetes_algorithm <- function(data) {
 
     # remove original diabetes variables to avoid duplication
     dplyr::select(- t1dm_date, - t2dm_date, - otherdm_date, - gestationaldm_date) %>%
-    # GESTATIONAL
-    mutate(gestationaldm_date = as_date(case_when(cat_diabetes == "GDM" ~ tmp_first_diabetes_diag_date)),
+           # GESTATIONAL
+    mutate(gestationaldm_date = as_date(case_when(cat_diabetes == "GDM" ~ tmp_first_diabetes_diag_date,
+                                                  TRUE ~ as.Date(NA))),
            # T2DM
-           t2dm_date = as_date(case_when(cat_diabetes == "T2DM" ~ tmp_first_diabetes_diag_date)),
+           t2dm_date = as_date(case_when(cat_diabetes == "T2DM" ~ tmp_first_diabetes_diag_date,
+                                         TRUE ~ as.Date(NA))),
            # T1DM
-           t1dm_date = as_date(case_when(cat_diabetes == "T1DM" ~ tmp_first_diabetes_diag_date)),
+           t1dm_date = as_date(case_when(cat_diabetes == "T1DM" ~ tmp_first_diabetes_diag_date,
+                                         TRUE ~ as.Date(NA))),
            # OTHER
-           otherdm_date = as_date(case_when(cat_diabetes == "DM_other" ~ pmin(tmp_hba1c_date_step7, tmp_over5_pocc_step7, na.rm = TRUE)))
+           otherdm_date = as_date(case_when(cat_diabetes == "DM_other" ~ pmin(tmp_hba1c_date_step7, tmp_over5_pocc_step7, na.rm = TRUE),
+                                            TRUE ~ as.Date(NA)))
            )
 
   return(data)
