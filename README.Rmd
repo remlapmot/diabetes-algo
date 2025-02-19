@@ -3,7 +3,7 @@ output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. 
-Please edit that file and rerun in R `rmarkdown::render('README.Rmd')` -->
+Please edit that file and rerun in R `rmarkdown::render('README.Rmd')` or run `just render` in a Terminal -->
 
 # diabetes-algo
 
