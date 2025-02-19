@@ -47,7 +47,9 @@ optparse::print_help(opt_parser)
 
 ## Diabetes Adjudication Algorithm Flowchart
 
-![Figure 1](diabetes-algo_fig.png)
+```{r, fig.cap = "Figure 1.", fig.alt="Flowchart of the Diabetes adjudication algorithm", echo=FALSE}
+knitr::include_graphics("diabetes-algo_fig.png")
+```
 
 This action can be specified in the `project.yaml` with its options at their default values as follows, 
 where you should replace `[version]` with the latest tag from 
