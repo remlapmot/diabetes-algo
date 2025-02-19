@@ -115,12 +115,6 @@ record_args <- data.frame(argument = names(opt),
                           stringsAsFactors = FALSE)
 row.names(record_args) <- NULL
 
-### Is this needed?
-# print(record_args)
-# write.csv(record_args,
-#           file = paste0("output/args-", opt$df_output),
-#           row.names = FALSE)
-
 ################################################################################
 # Load data
 ################################################################################
