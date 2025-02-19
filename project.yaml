@@ -8,7 +8,7 @@ actions:
         dataset: output/input.csv
 
   data_process:
-    run: r:latest analysis/data_process.R
+    run: r:v2 analysis/data_process.R
     needs:
     - generate_dataset
     outputs:

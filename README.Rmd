@@ -3,7 +3,7 @@ output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. 
-Please edit that file and rerun in R `rmarkdown::render('README.Rmd')` -->
+Please edit that file and rerun in R `rmarkdown::render('README.Rmd')` or run `just render` in a Terminal -->
 
 # diabetes-algo
 
@@ -41,13 +41,15 @@ source_lines <- function(file, lines) {
 }
 # Note: in the following command the last line should be the line that
 # creates the opt_parser object using OptionParser(...)
-source_lines("analysis/data_process.R", 30:104)
+source_lines("analysis/data_process.R", 34:108)
 optparse::print_help(opt_parser)
 ```
 
 ## Diabetes Adjudication Algorithm Flowchart
 
-![Figure 1](diabetes-algo_fig.png)
+```{r, fig.cap = "Figure 1.", fig.alt="Flowchart of the Diabetes adjudication algorithm", echo=FALSE}
+knitr::include_graphics("diabetes-algo_fig.png")
+```
 
 This action can be specified in the `project.yaml` with its options at their default values as follows, 
 where you should replace `[version]` with the latest tag from 
@@ -92,4 +94,4 @@ research quality.
 Read more at [OpenSAFELY.org](https://opensafely.org).
 
 # Licences
-As standard, research projects have a MIT license. 
+As standard, research projects have a MIT license.
